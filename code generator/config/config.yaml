@@ -1,0 +1,35 @@
+# project: TCS_CICX1      # nombre del proyecto, sin espacios; se usará para nombres de archivo y macros
+# file: threads            # nombre base del archivo; la plantilla generará <project>_<file>_config.h
+# tasks:
+#   - name: TaskOne       # nombre de la tarea (sin espacios, preferiblemente CamelCase o snake_case según convención)
+#     stack_size: 1024    # tamaño de stack en unidades (p.ej. ULONGs)
+#     priority: 10        # prioridad para tx_thread_create
+#     task_param: 0       # valor para pasar como parámetro, o cualquier otra configuración
+#   - name: TaskTwo
+#     stack_size: 512
+#     priority: 5
+#     task_param: 1
+#   # ... más tareas si se desea
+project: MyProject
+file: tasks
+
+# Valores por defecto para cada tarea
+defaults: &defaults
+  priority: 10
+  stack_size: 1024
+  task_param: 0
+  auto_start: false    # valor por defecto: arrancar automáticamente
+tasks:
+  - name: TaskOne
+    entry: TaskOne_Entry
+    <<: *defaults
+    task_param: "(ULONG)&data_sensor_instance"
+  - name: TaskTwo
+    entry: TaskTwo_Entry
+    # sobreescribimos solo priority, stack_size y task_param vendrán de defaults
+    priority: 5
+    <<: *defaults
+  - name: TaskThree
+    entry: TaskThree_Entry
+    # usa todos los defaults
+    <<: *defaults

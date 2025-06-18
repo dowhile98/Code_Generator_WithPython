@@ -1,0 +1,97 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : {{ project }}_{{ file }}.h
+  *
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2025 TECNA PERU S.A.C.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __{{ file | upper }}_H
+#define __{{ file | upper }}_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "tx_api.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "{{ project }}_{{ file }}_config.h"
+/* USER CODE END Includes */
+
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
+
+/* USER CODE END ET */
+
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
+
+/* USER CODE END EC */
+
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
+
+/* USER CODE END EM */
+
+/* Exported variables --------------------------------------------------------*/
+{% if tasks %}
+  /* Declaración de hilos ThreadX para cada tarea */
+  {% for task in tasks %}
+extern TX_THREAD {{ task.name }}_thread;
+  {% endfor %}
+{% else %}
+  /* No hay tareas definidas en YAML */
+{% endif %}
+
+/* Exported functions prototypes ---------------------------------------------*/
+
+/**
+  * @brief {{ project }} thread create/init function
+  * @param memory: puntero a área de memoria para control blocks u otros recursos necesarios
+  * @retval TX_SUCCESS si la creación fue exitosa, otro código en caso de error
+  */
+UINT {{ project | replace('-', '_') }}_threads_initialize(void *memory);
+
+{% if tasks %}
+  {% for task in tasks %}
+/**
+  * @brief  Entry function para la tarea {{ task.name }}
+  * @param  param: valor definido en {{ project }}_{{ file }}_config.h como {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS
+  * @retval none
+  */
+void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry(ULONG param);
+  {% endfor %}
+{% else %}
+  /* No hay prototipos de entrada porque no hay tareas */
+{% endif %}
+
+/* USER CODE BEGIN EFP */
+
+/* USER CODE END EFP */
+
+/* Private defines -----------------------------------------------------------*/
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __{{ file | upper }}_H */

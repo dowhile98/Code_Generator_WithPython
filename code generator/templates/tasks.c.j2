@@ -1,0 +1,100 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    {{ project }}_{{ file }}.c
+  * @brief   Código de inicialización de hilos para {{ project }}.
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2025 TECNA PERU S.A.C.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Includes ------------------------------------------------------------------*/
+#include "{{ project }}_{{ file }}.h"
+
+/* USER CODE BEGIN 0 */
+{% if tasks %}
+  /* Declaración de handles ThreadX para cada tarea */
+  {% for task in tasks %}
+TX_THREAD {{ task.name }}_thread;
+  {% endfor %}
+{% endif %}
+/* USER CODE END 0 */
+
+/*----------------------------------------------------------------------------*/
+/* threads {{ project }}                                                     */
+/*----------------------------------------------------------------------------*/
+/* USER CODE BEGIN 1 */
+
+/**
+  * @brief thread initialize function
+  * @param memory: puntero a TX_BYTE_POOL u otro recurso para asignar pilas
+  * @retval TX_SUCCESS si todo OK, error en otro caso
+  */
+UINT {{ project | replace('-', '_') }}_threads_initialize(void *memory) {
+    /* Local variables -------------------------------------------------------*/
+    CHAR *pointer;
+    TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL *)memory;
+    UINT ret = TX_SUCCESS;
+
+    {% if tasks %}
+    /* Crear hilos según configuración */
+    {% for task in tasks %}
+    /* Allocate the stack for {{ task.name }} thread */
+    if (tx_byte_allocate(byte_pool, (VOID **)&pointer,
+        {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_STACK_SIZE,
+        TX_NO_WAIT) != TX_SUCCESS)
+    {
+        return TX_POOL_ERROR;
+    }
+
+    /* Create {{ task.name }} thread */
+    if (tx_thread_create(
+            &{{ task.name }}_thread,
+            "{{ task.name }}",
+            {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry,
+            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS,
+            pointer,
+            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_STACK_SIZE,
+            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PRIORITY,
+            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PRIORITY,
+            TX_NO_TIME_SLICE,
+            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_AUTO_START) != TX_SUCCESS)
+    {
+        return TX_THREAD_ERROR;
+    }
+    {% endfor %}
+    {% endif %}
+
+    return ret;
+}
+
+/* Entry functions for cada tarea */
+{% if tasks %}
+  {% for task in tasks %}
+/**
+  * @brief  Entry para la tarea {{ task.name }}
+  * @param  param: valor definido en {{ project }}_{{ file }}_config.h como {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS
+  * @retval none
+  */
+__weak void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry(ULONG param) {
+    /* init o variables locales si se necesita */
+    for (;;) {
+        tx_thread_sleep(1000);
+    }
+}
+  {% endfor %}
+{% endif %}
+/* USER CODE END 1 */
+
+/* USER CODE BEGIN 2 */
+
+/* USER CODE END 2 */
