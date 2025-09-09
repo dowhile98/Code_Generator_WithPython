@@ -1,3 +1,4 @@
+# python main.py --yaml config/config.yaml --templates templates --outdir Generated
 
 import yaml
 from jinja2 import Environment, FileSystemLoader
@@ -86,9 +87,10 @@ def render_task_source(cfg, env, output_dir='.'):
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Generar config.h y tasks.h desde YAML y plantillas")
-    parser.add_argument('yaml', help="Ruta al archivo YAML de configuración")
+    # parser.add_argument('yaml', help="Ruta al archivo YAML de configuración")
+    parser.add_argument('--yaml', default='config/config.yaml', help="Ruta al archivo YAML de configuración (por defecto: config/config.yaml)")
     parser.add_argument('--templates', default='templates', help="Directorio donde están las plantillas Jinja2")
-    parser.add_argument('--outdir', default='.', help="Directorio de salida para los archivos generados")
+    parser.add_argument('--outdir', default='Generated', help="Directorio de salida para los archivos generados")
     args = parser.parse_args()
 
     # Cargar configuración

@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : {{ project }}_{{ file }}.h
+  * @file           : tcs_xxx_threads_config.h
   *
   ******************************************************************************
   * @attention
@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __{{ file | upper }}_H
-#define __{{ file | upper }}_H
+#ifndef __THREADS_CONFIG_H
+#define __THREADS_CONFIG_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,7 @@ extern "C" {
 #include "os_port.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "{{ project }}_{{ file }}_config.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -48,44 +48,29 @@ extern "C" {
 
 /* USER CODE END EM */
 
-/* Exported variables --------------------------------------------------------*/
-{% if tasks %}
-  /* Declaración de hilos ThreadX para cada tarea */
-  {% for task in tasks %}
-extern OsTaskId {{ task.name }}_thread;
-  {% endfor %}
-{% else %}
-  /* No hay tareas definidas en YAML */
-{% endif %}
-
 /* Exported functions prototypes ---------------------------------------------*/
-
-/**
-  * @brief {{ project }} thread create/init function
-  * @param memory: puntero a área de memoria para control blocks u otros recursos necesarios
-  * @retval TX_SUCCESS si la creación fue exitosa, otro código en caso de error
-  */
-error_t {{ project | replace('-', '_') }}_tasks_initialize(void *memory);
-
-{% if tasks %}
-  {% for task in tasks %}
-/**
-  * @brief  Entry function para la tarea {{ task.name }}
-  * @param  param: valor definido en {{ project }}_{{ file }}_config.h como {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS
-  * @retval none
-  */
-void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry(void *param);
-  {% endfor %}
-{% else %}
-  /* No hay prototipos de entrada porque no hay tareas */
-{% endif %}
-
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+
 /* USER CODE BEGIN Private defines */
+/* Definiciones para la tarea wifi */
+#define TCS_XXX_WIFI_STACK_SIZE    1024
+#define TCS_XXX_WIFI_PRIORITY      10
+#define TCS_XXX_WIFI_PARAMS        (ULONG)&memory
+
+/* Definiciones para la tarea display */
+#define TCS_XXX_DISPLAY_STACK_SIZE    1024
+#define TCS_XXX_DISPLAY_PRIORITY      11
+#define TCS_XXX_DISPLAY_PARAMS        0
+
+/* Definiciones para la tarea data */
+#define TCS_XXX_DATA_STACK_SIZE    1024
+#define TCS_XXX_DATA_PRIORITY      10
+#define TCS_XXX_DATA_PARAMS        0
+
 
 /* USER CODE END Private defines */
 
@@ -93,4 +78,4 @@ void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry
 }
 #endif
 
-#endif /* __{{ file | upper }}_H */
+#endif /* __THREADS_CONFIG_H */

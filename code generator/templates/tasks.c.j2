@@ -21,10 +21,13 @@
 #include "{{ project }}_{{ file }}.h"
 
 /* USER CODE BEGIN 0 */
+
+extern uint8_t osPoolInit(void *pointer);
+
 {% if tasks %}
   /* Declaración de handles ThreadX para cada tarea */
   {% for task in tasks %}
-TX_THREAD {{ task.name }}_thread;
+OsTaskId {{ task.name }}_thread;
   {% endfor %}
 {% endif %}
 /* USER CODE END 0 */
@@ -39,38 +42,35 @@ TX_THREAD {{ task.name }}_thread;
   * @param memory: puntero a TX_BYTE_POOL u otro recurso para asignar pilas
   * @retval TX_SUCCESS si todo OK, error en otro caso
   */
-UINT {{ project | replace('-', '_') }}_threads_initialize(void *memory) {
+error_t {{ project | replace('-', '_') }}_tasks_initialize(void *memory) {
     /* Local variables -------------------------------------------------------*/
-    CHAR *pointer;
-    TX_BYTE_POOL *byte_pool = (TX_BYTE_POOL *)memory;
-    UINT ret = TX_SUCCESS;
+    OsTaskParameters params = OS_TASK_DEFAULT_PARAMS;
+    error_t ret = ERROR_NONE;
+
+    /*ospool mem init*/
+    osPoolInit(memory);
 
     {% if tasks %}
     /* Crear hilos según configuración */
     {% for task in tasks %}
-    /* Allocate the stack for {{ task.name }} thread */
-    if (tx_byte_allocate(byte_pool, (VOID **)&pointer,
-        {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_STACK_SIZE,
-        TX_NO_WAIT) != TX_SUCCESS)
-    {
-        return TX_POOL_ERROR;
-    }
 
-    /* Create {{ task.name }} thread */
-    if (tx_thread_create(
-            &{{ task.name }}_thread,
-            "{{ task.name }}",
-            {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry,
-            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS,
-            pointer,
-            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_STACK_SIZE,
-            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PRIORITY,
-            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PRIORITY,
-            TX_NO_TIME_SLICE,
-            {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_AUTO_START) != TX_SUCCESS)
+    /* task {{ task.name }} */
+    params = OS_TASK_DEFAULT_PARAMS;
+    params.priority = {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PRIORITY;
+    params.stackSize = {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_STACK_SIZE;
+
+    {{ task.name }}_thread = osCreateTask("{{ task.name }}", 
+                              {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry, 
+                              {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS, 
+                              &params);
+
+    /* Check {{ task.name }} thread creation */
+    if({{ task.name }}_thread == NULL)
     {
-        return TX_THREAD_ERROR;
+      ret = ERROR_FAILURE;
+      return ret;
     }
+    
     {% endfor %}
     {% endif %}
 
@@ -85,10 +85,10 @@ UINT {{ project | replace('-', '_') }}_threads_initialize(void *memory) {
   * @param  param: valor definido en {{ project }}_{{ file }}_config.h como {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS
   * @retval none
   */
-__weak void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry(ULONG param) {
+__weak void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry(void *param) {
     /* init o variables locales si se necesita */
     for (;;) {
-        tx_thread_sleep(1000);
+        osDelayTask(1000);
     }
 }
   {% endfor %}

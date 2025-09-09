@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : {{ project }}_{{ file }}.h
+  * @file           : tcs_xxx_threads.h
   *
   ******************************************************************************
   * @attention
@@ -18,8 +18,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __{{ file | upper }}_H
-#define __{{ file | upper }}_H
+#ifndef __THREADS_H
+#define __THREADS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,7 @@ extern "C" {
 #include "os_port.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "{{ project }}_{{ file }}_config.h"
+#include "tcs_xxx_threads_config.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -49,36 +49,38 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported variables --------------------------------------------------------*/
-{% if tasks %}
   /* Declaración de hilos ThreadX para cada tarea */
-  {% for task in tasks %}
-extern OsTaskId {{ task.name }}_thread;
-  {% endfor %}
-{% else %}
-  /* No hay tareas definidas en YAML */
-{% endif %}
+extern OsTaskId wifi_thread;
+extern OsTaskId display_thread;
+extern OsTaskId data_thread;
 
 /* Exported functions prototypes ---------------------------------------------*/
 
 /**
-  * @brief {{ project }} thread create/init function
+  * @brief tcs_xxx thread create/init function
   * @param memory: puntero a área de memoria para control blocks u otros recursos necesarios
   * @retval TX_SUCCESS si la creación fue exitosa, otro código en caso de error
   */
-error_t {{ project | replace('-', '_') }}_tasks_initialize(void *memory);
+error_t tcs_xxx_tasks_initialize(void *memory);
 
-{% if tasks %}
-  {% for task in tasks %}
 /**
-  * @brief  Entry function para la tarea {{ task.name }}
-  * @param  param: valor definido en {{ project }}_{{ file }}_config.h como {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS
+  * @brief  Entry function para la tarea wifi
+  * @param  param: valor definido en tcs_xxx_threads_config.h como TCS_XXX_WIFI_PARAMS
   * @retval none
   */
-void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry(void *param);
-  {% endfor %}
-{% else %}
-  /* No hay prototipos de entrada porque no hay tareas */
-{% endif %}
+void tcs_xxx_wifi_entry(void *param);
+/**
+  * @brief  Entry function para la tarea display
+  * @param  param: valor definido en tcs_xxx_threads_config.h como TCS_XXX_DISPLAY_PARAMS
+  * @retval none
+  */
+void tcs_xxx_display_entry(void *param);
+/**
+  * @brief  Entry function para la tarea data
+  * @param  param: valor definido en tcs_xxx_threads_config.h como TCS_XXX_DATA_PARAMS
+  * @retval none
+  */
+void tcs_xxx_data_entry(void *param);
 
 /* USER CODE BEGIN EFP */
 
@@ -93,4 +95,4 @@ void {{ project | replace('-', '_') }}_{{ task.name | replace('-', '_') }}_entry
 }
 #endif
 
-#endif /* __{{ file | upper }}_H */
+#endif /* __THREADS_H */

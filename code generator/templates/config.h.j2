@@ -27,8 +27,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tx_api.h"
-
+#include "os_port.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -62,7 +61,6 @@ extern "C" {
 #define {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_STACK_SIZE    {{ task.stack_size }}
 #define {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PRIORITY      {{ task.priority }}
 #define {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_PARAMS        {{ task.task_param }}
-#define {{ project | replace('-', '_') | upper }}_{{ task.name | replace('-', '_') | upper }}_AUTO_START  {% if task.auto_start %}TX_AUTO_START{% else %}TX_DONT_START{% endif %}
 
 {% endfor %}
 
